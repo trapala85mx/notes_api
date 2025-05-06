@@ -28,3 +28,43 @@ def notes(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+def notes_detail(request, pk: int):
+    """Vista basada en función para modificar notas y
+    obtener detalles de una nota en específico"""
+    # Buscamos la nota con el id enviado
+    try:
+        note = Note.objects.get(id=pk)
+    except Note.DoesNotExist:
+        # Si no existe arrojamos un 404
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    method = request.method
+
+    # Si se encuentra la nota vemos qué método se envió
+
+    if method == "GET":
+        # un JSON con el serializador, en este caso, para leer
+        serializer = NoteReadSerializer(note)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+    if method == "PUT":
+        # Actualizar toda los campos de la nota.
+        serializer = NoteWriteSerializer(note, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    if method == "PATCH":
+        # Actualizar solo los campos enviados
+        serializer = NoteWriteSerializer(note, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    if method == "DELETE":
+        # Eliminamos la nota
+        note.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
