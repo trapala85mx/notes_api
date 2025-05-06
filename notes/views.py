@@ -24,10 +24,9 @@ def notes(request):
     if method == "POST":
         # Crear una nota
         serializer = NoteWriteSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        note = serializer.save()
+        return Response(NoteReadSerializer(note).data, status=status.HTTP_201_CREATED)
 
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
@@ -55,14 +54,22 @@ def notes_detail(request, pk: int):
         serializer = NoteWriteSerializer(note, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(NoteReadSerializer(note).data, status=status.HTTP_201_CREATED)
 
     if method == "PATCH":
         # Actualizar solo los campos enviados
         serializer = NoteWriteSerializer(note, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # Explicación de esta línea:
+        # note es una instancia del modelo Note , obtenida previamente
+        # Esto quiere decir que note es un objeto de la base de datos, como si fuera un registro de tu tabla notes.
+        # por lo que ya tiene todos los datos
+        # Al hacer NoteReadSerializer(note)
+        # Estamos diciendo: "Serializa este objeto (note) según las reglas definidas en NoteReadSerializer".
+        # En este punto NoteReadSerializer(note), la data actualizada ya la tenemos como no NoteReadSerializer
+        # Solo basta retornar el json con ".data"
+        return Response(NoteReadSerializer(note).data, status=status.HTTP_201_CREATED)
 
     if method == "DELETE":
         # Eliminamos la nota
