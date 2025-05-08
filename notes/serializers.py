@@ -13,3 +13,7 @@ class NoteSerializer(ModelSerializer):
 
         model = Note
         fields = "__all__"
+        extra_kwargs = {
+            "title": {"required": False},
+            "content": {"required": False},
+        }
