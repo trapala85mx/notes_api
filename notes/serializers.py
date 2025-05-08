@@ -5,7 +5,7 @@ from rest_framework.serializers import ModelSerializer
 from .models import Note
 
 
-class NoteReadSerializer(ModelSerializer):
+class NoteSerializer(ModelSerializer):
     """Serializer para lectura del modelo Note"""
 
     class Meta:
@@ -13,13 +13,7 @@ class NoteReadSerializer(ModelSerializer):
 
         model = Note
         fields = "__all__"
-
-
-class NoteWriteSerializer(ModelSerializer):
-    """Serializer para lectura del modelo Note"""
-
-    class Meta:
-        """Metadatos del serializer"""
-
-        model = Note
-        fields = ["title", "content"]
+        extra_kwargs = {
+            "title": {"required": False},
+            "content": {"required": False},
+        }
