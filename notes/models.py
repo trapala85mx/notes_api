@@ -1,5 +1,6 @@
 """notes/models.py"""
 
+from django.conf import settings  # Para usar AUTH_USER_MODEL
 from django.db import models
 
 
@@ -12,6 +13,12 @@ class Note(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creación")
     updated_at = models.DateTimeField(
         auto_now=True, verbose_name="Última actualización"
+    )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="notes",
     )
 
     def __str__(self):
