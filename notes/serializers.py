@@ -12,7 +12,7 @@ class NoteSerializer(ModelSerializer):
         """Metadatos del serializer"""
 
         model = Note
-        fields = "__all__"
+        exclude = ["user"]
         extra_kwargs = {
             "title": {"required": False},
             "content": {"required": False},
